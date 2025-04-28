@@ -1,0 +1,85 @@
+﻿@model FileDigitilizationSystem.Models.FileRecord
+@{
+    ViewData["Title"] = "Edit File Entry";
+    Layout = "~/Views/Shared/_RequesterLayout.cshtml";
+}
+
+<h2 class="mb-4">Edit File Entry</h2>
+<form asp-controller="Records" asp-action="Edit" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label asp-for="Reference" class="form-label"></label>
+                <input asp-for="Reference" class="form-control" />
+                <span asp-validation-for="Reference" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="ApplicantName" class="form-label"></label>
+                <input asp-for="ApplicantName" class="form-control" />
+                <span asp-validation-for="ApplicantName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="ApplicantId" class="form-label"></label>
+                <input asp-for="ApplicantId" class="form-control" />
+                <span asp-validation-for="ApplicantId" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="ApplicantType" class="form-label"></label>
+                <select asp-for="ApplicantType" class="form-select" asp-items="ViewBag.ApplicantTypeList"></select>
+                <span asp-validation-for="ApplicantType" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Province" class="form-label"></label>
+                <select asp-for="Province" class="form-select" asp-items="ViewBag.ProvinceList"></select>
+                <span asp-validation-for="Province" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Location" class="form-label"></label>
+                <select asp-for="Location" class="form-select" asp-items="ViewBag.LocationList"></select>
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="LandUseType" class="form-label"></label>
+                <select asp-for="LandUseType" class="form-select" asp-items="ViewBag.LandUseTypeList"></select>
+                <span asp-validation-for="LandUseType" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="SpecialStatus" class="form-label"></label>
+                <select asp-for="SpecialStatus" class="form-select" asp-items="ViewBag.SpecialStatusList"></select>
+                <span asp-validation-for="SpecialStatus" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label asp-for="Shelf" class="form-label"></label>
+                <input asp-for="Shelf" class="form-control" />
+                <span asp-validation-for="Shelf" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Row" class="form-label"></label>
+                <input asp-for="Row" class="form-control" />
+                <span asp-validation-for="Row" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="EmployerInfo" class="form-label"></label>
+                <input asp-for="EmployerInfo" class="form-control" />
+                <span asp-validation-for="EmployerInfo" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Scanned Files (Add/Replace)</label>
+                <input type="file" name="scannedFiles" id="scannedFilesEdit" multiple class="form-control" />
+            </div>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a asp-action="Dashboard" class="btn btn-secondary ms-2">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+    <script>
+        FilePond.create(document.querySelector('#scannedFilesEdit'));
+    </script>
+}

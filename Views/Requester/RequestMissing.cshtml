@@ -1,0 +1,43 @@
+﻿@model FileDigitilizationSystem.Models.RequestMissingViewModel
+@{
+    Layout = "~/Views/Shared/_RequesterLayout.cshtml";
+}
+<h2>Request Missing File</h2>
+<form asp-action="RequestMissing" method="post">
+    <div class="mb-3">
+        <label asp-for="Reference"></label>
+        <input asp-for="Reference" class="form-control" />
+        <span asp-validation-for="Reference" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Suburb"></label>
+        <input asp-for="Suburb" class="form-control" />
+        <span asp-validation-for="Suburb" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="ApplicantType"></label>
+        <select asp-for="ApplicantType" class="form-select"
+                asp-items="@(ViewBag.ApplicantTypes as SelectList)">
+            <option value="">-- Select Type --</option>
+        </select>
+        <span asp-validation-for="ApplicantType" class="text-danger"></span>
+    </div>
+    <!-- existing fields -->
+    <div class="mb-3">
+        <label asp-for="ApplicantName"></label>
+        <input asp-for="ApplicantName" class="form-control" />
+        <span asp-validation-for="ApplicantName" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Province"></label>
+        <input asp-for="Province" class="form-control" />
+        <span asp-validation-for="Province" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Notes"></label>
+        <textarea asp-for="Notes" class="form-control"></textarea>
+        <span asp-validation-for="Notes" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Request</button>
+    <a asp-controller="Requester" asp-action="Dashboard" class="btn btn-secondary ms-2">Cancel</a>
+</form>

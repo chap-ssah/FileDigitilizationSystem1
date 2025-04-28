@@ -1,0 +1,76 @@
+﻿@model DashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard Overview</h1>
+    <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#createRoleModal">
+        <i class="bi bi-shield-lock"></i> Create Role
+    </button>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
+        <i class="bi bi-person-plus"></i> Add User
+    </button>
+</div>
+
+<!-- Existing Metrics Cards and Activity Feed -->
+<!-- User Management Section -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">User Management</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Last Login</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model.Users)
+                            {
+                                <tr>
+                                    <td>@user.FirstName @user.LastName</td>
+                                    <td>@user.Email</td>
+                                    <td>@user.Role</td>
+                                    <td>
+                                        <span class="badge @(user.IsActive ? "bg-success" : "bg-danger")">
+                                            @(user.IsActive ? "Active" : "Inactive")
+                                        </span>
+                                    </td>
+                                    <td>@user.LastLogin?.ToString("g")</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary edit-user"
+                                                data-userid="@user.Id">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger delete-user"
+                                                data-userid="@user.Id">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-warning reset-password"
+                                                data-userid="@user.Id">
+                                            <i class="bi bi-key"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+@await Html.PartialAsync("_UserModals", Model)
