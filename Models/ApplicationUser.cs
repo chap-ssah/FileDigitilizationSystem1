@@ -11,5 +11,8 @@ namespace FileDigitilizationSystem.Models
         public DateTime? DeactivationDate { get; set; }
 
         public DateTime? LastLogin { get; set; }
+        public string Address { get; set; }
+        public string Gender { get; set; }
+        
     }
 }

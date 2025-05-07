@@ -1,162 +1,195 @@
 ﻿@model FileDigitilizationSystem.Models.RequesterDashboardViewModel
 @{
     ViewData["Title"] = "Requester Dashboard";
-    Layout = "~/Views/Shared/_RequesterLayout.cshtml"; // Use dedicated requester layout
+    Layout = "~/Views/Shared/_RequesterLayout.cshtml";
 }
 
 <!-- Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>FILE SEARCH</h2>
-    
+    <h2 class="fw-bold">File Search</h2>
 </div>
 
-<!-- Search Functionality -->
-<div class="card mb-4">
+<!-- Search Section -->
+<div class="card shadow-sm mb-4">
     <div class="card-body">
-        <form asp-action="Search" method="get" class="row g-2 align-items-end">
-            <div class="col-md-6">
+        <form asp-action="Search" method="get" class="row g-3 align-items-end">
+            <div class="col-md-5">
                 <label class="form-label">Search Files</label>
-                <input name="q" class="form-control" placeholder="Search by File Ref, Location, or Applicant ID/Name" />
+                <input name="q" class="form-control" placeholder="File Ref, Location, Applicant Name or ID" />
             </div>
             <div class="col-md-3">
                 <label class="form-label">Location</label>
                 <select name="location" class="form-select">
-                    <option value="">All</option>
+                    <option value="">All Locations</option>
                     <option>Glen View</option>
                     <option>Budiriro</option>
                     <option>Other</option>
                 </select>
             </div>
-            <div class="col-md-3">
-                <div class="form-check form-check-inline mt-4 pt-2">
-                    <input class="form-check-input" type="checkbox" name="digitized" id="digital" />
-                    <label class="form-check-label" for="digital">Digital Files</label>
+            <div class="col-md-2">
+                <label class="form-label">File Type</label>
+                <div class="d-flex gap-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="digitized" id="digital" />
+                        <label class="form-check-label" for="digital">Digital</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="physical" id="physical" />
+                        <label class="form-check-label" for="physical">Physical</label>
+                    </div>
                 </div>
-                <div class="form-check form-check-inline mt-4 pt-2">
-                    <input class="form-check-input" type="checkbox" name="physical" id="physical" />
-                    <label class="form-check-label" for="physical">Physical Files</label>
-                </div>
-                <button type="submit" class="btn btn-primary ms-3 mt-4">
+            </div>
+            <div class="col-md-2 text-end">
+                <button type="submit" class="btn btn-primary w-100">
                     <i class="bi bi-search"></i> Search
                 </button>
             </div>
         </form>
     </div>
 </div>
-<!-- No-Results Alert (new) -->
+
+<!-- No Results -->
 @if (Model.NoResults)
 {
-    <div class="alert alert-warning">
-        No files found matching "@Model.SearchQuery".
-        <a asp-action="RequestMissing" asp-route-reference="@Model.SearchQuery">Request this file</a>
-        from our Records Team.
+    <div class="alert alert-warning shadow-sm">
+        No files found matching "<strong>@Model.SearchQuery</strong>".
+        <a asp-action="RequestMissing" asp-route-reference="@Model.SearchQuery" class="alert-link">Request this file</a> from Records Team.
     </div>
 }
 
 <!-- Search Results -->
 @if (Model.SearchResults != null && Model.SearchResults.Any())
 {
-    <h4>Search Results</h4>
-    <div class="table-responsive mb-4">
-        <table class="table table-hover align-middle">
-            <thead>
-                <tr>
-                    <th>Reference</th>
-                    <th>ApplicantName</th>
-                    <th>Suburb</th>
-                    <th>Land Use Type</th>
-                    <th>Status</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var file in Model.SearchResults)
-                {
-                    <tr>
-                        <td>@file.Reference</td>
-                        <td>@file.ApplicantName</td>
-                        <td>@file.Location</td>
-
-                        <td>@file.LandUseType</td>
-                        <td>@(file.IsDigital ? "Digital" : "Physical")</td>
-                        <td class="text-end">
-                            @if (file.IsDigital)
-                            {
-                                <a asp-action="Download"
-                                   asp-route-id="@file.Id"
-                                   class="btn btn-sm btn-success">
-                                    <i class="bi bi-download"></i> Download
-                                </a>
-                            }
-                            else
-                            {
-                                <button class="btn btn-sm btn-warning"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#requestDigitizeModal"
-                                        data-fileid="@file.Id">
-                                    <i class="bi bi-file-earmark-arrow-up"></i> Request Digitization
-                                </button>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white fw-bold">
+            Search Results
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Reference</th>
+                            <th>Applicant</th>
+                            <th>Location</th>
+                            <th>Land Use</th>
+                            <th>Status</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var file in Model.SearchResults)
+                        {
+                            <tr>
+                                <td>@file.Reference</td>
+                                <td>@file.ApplicantName</td>
+                                <td>@file.Location</td>
+                                <td>@file.LandUseType</td>
+                                <td>
+                                    <span class="badge bg-@(file.IsDigital ? "success" : "secondary")">
+                                        @(file.IsDigital ? "Digital" : "Physical")
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    @if (!string.IsNullOrEmpty(file.FilePath))
+                                    {
+                                        <a class="btn btn-sm btn-outline-success" href="~/@file.FilePath" target="_blank">
+                                            <i class="bi bi-download"></i> Download
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-sm btn-warning"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#requestDigitizeModal"
+                                                data-fileid="@file.Id">
+                                            <i class="bi bi-upload"></i> Request Digitization
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 }
 
-
-<!-- Request Digitization Modal -->
-
-
 <!-- Notifications & Recent Requests -->
-<div class="row mt-4">
+<div class="row">
     <div class="col-md-6">
-        <div class="card mb-3 h-100" style="background-color:#ffeeba;">
-            <div class="card-header">Notifications</div>
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-warning fw-bold">Notifications</div>
             <div class="card-body">
                 @if (Model.Notifications.Any())
                 {
                     <ul class="list-group list-group-flush">
                         @foreach (var note in Model.Notifications)
                         {
-                            <li class="list-group-item">
-                                <i class="bi bi-bell-fill me-2"></i>
-                                @note.Message
-                                <span class="text-muted small float-end">@note.Timestamp.ToString("g")</span>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <div><i class="bi bi-bell-fill text-warning me-2"></i>@note.Message</div>
+                                <small class="text-muted">@note.Timestamp.ToString("g")</small>
                             </li>
                         }
                     </ul>
                 }
                 else
                 {
-                    <p>No notifications at this time.</p>
+                    <p class="text-muted">No notifications at this time.</p>
                 }
             </div>
         </div>
     </div>
+
     <div class="col-md-6">
-        <div class="card mb-3 h-100" style="background-color:#d1ecf1;">
-            <div class="card-header">Recent Requests</div>
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-info text-white fw-bold">Recent Requests</div>
             <div class="card-body">
                 @if (Model.RecentRequests.Any())
                 {
                     <ul class="list-group list-group-flush">
                         @foreach (var req in Model.RecentRequests)
                         {
-                            <li class="list-group-item">
-                                <strong>@req.Reference</strong> - @(req.Handled ? "Completed" : "Pending")
-
-                                <span class="text-muted small float-end">@req.CreatedAt.ToString("g")</span>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <div>
+                                    <strong>@req.Reference</strong> -
+                                    <span class="badge bg-@(req.Handled ? "success" : "secondary")">
+                                        @(req.Handled ? "Completed" : "Pending")
+                                    </span>
+                                </div>
+                                <small class="text-muted">@req.CreatedAt.ToString("g")</small>
                             </li>
                         }
                     </ul>
                 }
                 else
                 {
-                    <p>No recent requests.</p>
+                    <p class="text-muted">No recent requests.</p>
                 }
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Request Digitization -->
+<div class="modal fade" id="requestDigitizeModal" tabindex="-1" aria-labelledby="requestDigitizeLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="RequestDigitization" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="requestDigitizeLabel">Request Digitization</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="fileId" id="modalFileId" />
+                    <p>Are you sure you want to request digitization of this file?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Yes, Request</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -165,8 +198,8 @@
     <script>
         var reqModal = document.getElementById('requestDigitizeModal');
         reqModal.addEventListener('show.bs.modal', function (e) {
-            var btn = e.relatedTarget;
-            var fileId = btn.getAttribute('data-fileid');
+            var button = e.relatedTarget;
+            var fileId = button.getAttribute('data-fileid');
             reqModal.querySelector('#modalFileId').value = fileId;
         });
     </script>

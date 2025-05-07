@@ -1,147 +1,45 @@
-﻿@model RecordsDashboardViewModel
+﻿@model FileDigitilizationSystem.Models.RecordsDashboardViewModel
 @{
     ViewData["Title"] = "Records Management Dashboard";
     Layout = "~/Views/Shared/_RecordsLayout.cshtml";
 }
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Records Management</h2>
-    
-</div>
 
-<!-- 1️⃣ Search & Filter -->
-<!-- 1️⃣ Search & Filter -->
-<div class="card mb-4">
-    <div class="card-body">
-        <form asp-action="Search" method="get" class="row g-2">
-            <div class="col-md-4">
-                <input name="q" value="@Model.SearchQuery"
-                       class="form-control" placeholder="Search by Ref, Name, ID…" />
+
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <a asp-action="Requests" asp-controller="Records" class="text-decoration-none text-dark">
+            <div class="card shadow-sm rounded-4 card-hover h-100">
+                <div class="card-body text-center p-4">
+                    <i class="bi bi-clock-history display-4 text-warning mb-3"></i>
+                    <h5 class="card-title fw-semibold">Pending Requests</h5>
+                    <p class="card-text fs-3 mb-0">@Model.PendingRequests</p>
+                </div>
             </div>
-            <div class="col-md-2">
-                <select name="province" class="form-select" asp-items="ViewBag.ProvinceList">
-                    <option value="">All Provinces</option>
-                </select>
+        </a>
+    </div>
+
+    <div class="col-md-4">
+        <a asp-action="Digitized" asp-controller="Records" class="text-decoration-none text-dark">
+            <div class="card shadow-sm rounded-4 card-hover h-100">
+                <div class="card-body text-center p-4">
+                    <i class="bi bi-cloud-check display-4 text-success mb-3"></i>
+                    <h5 class="card-title fw-semibold">Digitized Files</h5>
+                    <p class="card-text fs-3 mb-0">@Model.DigitizedFiles</p>
+                </div>
             </div>
-            <div class="col-md-2">
-                <select name="location" class="form-select" asp-items="ViewBag.LocationList">
-                    <option value="">All Suburbs</option>
-                </select>
+        </a>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm rounded-4 card-hover h-100">
+            <div class="card-body text-center p-4">
+                <i class="bi bi-bell-fill display-4 text-primary mb-3"></i>
+                <h5 class="card-title fw-semibold">Notifications</h5>
+                <p class="card-text fs-3 mb-0">@Model.Notifications.Count</p>
             </div>
-            <div class="col-md-2">
-                <select name="type" class="form-select" asp-items="ViewBag.ApplicantTypeList">
-                    <option value="">Type</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">
-                    <i class="bi bi-search"></i> Search
-                </button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<!-- 2️⃣ New File Entry -->
-<div class="mb-4">
-    <a asp-action="Create" class="btn btn-success"><i class="bi bi-file-earmark-person"></i> New File Entry</a>
-</div>
 
-<!-- 3️⃣ Requested Tasks -->
-<div class="card mb-4">
-    <div class="card-header">Requested Files</div>
-    <table class="table mb-0">
-        <thead>
-            <tr>
-                <th>Reference</th>
-                <th>Applicant</th>
-                <th>Type</th>
-                <th>Suburb</th>
-                <th>Province</th>
-                <th>Notes</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var req in Model.FileRequests)
-            {
-                <tr>
-                    <td>@req.Reference</td>
-                    <td>@req.ApplicantName</td>
-                    <td>@req.ApplicantType</td>
-                    <td>@req.Suburb</td>
-                    <td>@req.Province</td>
-                    <td>@req.Notes</td>
-                    <td>@(req.Handled ? "Completed" : "Pending")</td>
-                    <td>
-                        <a asp-action="Create"
-                           asp-route-requestId="@req.Id"
-                           asp-controller="Records"
-                           class="btn btn-sm btn-primary">
-                            Digitize
-                        </a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
-
-<!-- 4️⃣ Already Digitized -->
-<div class="card mb-4">
-    <div class="card-header">Digitized Files</div>
-    <table class="table mb-0">
-        <thead>
-            <tr>
-                <th>Reference</th>
-                <th>Applicant</th>
-                <th>Type</th>
-                <th>Suburb</th>
-                <th>Province</th>
-                <th>Uploaded</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var f in Model.DigitizedRecords)
-            {
-                <tr>
-                    <td>@f.Reference</td>
-                    <td>@f.ApplicantName</td>
-                    <td>@f.ApplicantType</td>
-                    <td>@f.Location</td>
-                    <td>@f.Province</td>
-                    <td>@f.CreatedAt.ToString("g")</td>
-                    <td>
-                        @if (!string.IsNullOrEmpty(f.FilePath))
-                        {
-                            <a class="btn btn-sm btn-success" href="~/@f.FilePath" target="_blank">
-                                <i class="bi bi-download"></i> Download
-                            </a>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
-
-<!-- 4️⃣ Notifications -->
-<div class="card mb-4 bg-warning">
-    <div class="card-header">Notifications</div>
-    <ul class="list-group list-group-flush">
-        @foreach (var n in Model.Notifications)
-        {
-            <li class="list-group-item">@n.Message <small class="text-muted float-end">@n.Timestamp.ToString("g")</small></li>
-        }
-    </ul>
-</div>
-
-<!-- 5️⃣ Reporting (placeholder for charts) -->
-<div class="card mb-4">
-    <div class="card-header">Reports & Analytics</div>
-    <div class="card-body">
-        <!-- TODO: integrate charting library (Recharts, Chart.js, etc.) -->
-        <p>Graph placeholders here…</p>
-    </div>
-</div>

@@ -1,18 +1,22 @@
-﻿using FileDigitilizationSystem.Models;
+﻿using System.Collections.Generic;
 
-public class RecordsDashboardViewModel
+namespace FileDigitilizationSystem.Models
 {
-    public string UserName { get; set; }
-    public IEnumerable<FileRecord> DigitizedRecords { get; set; }
-    public IEnumerable<FileRequest> FileRequests { get; set; }   // your new “tasks”
-    public IEnumerable<Notification> Notifications { get; set; }
-    public IEnumerable<FileRequest> RecentRequests { get; set; } = new List<FileRequest>();
+    public class RecordsDashboardViewModel
+    {
+        /// <summary>
+        /// Number of file requests not yet handled.
+        /// </summary>
+        public int PendingRequests { get; set; }
 
-    //for search
-    public bool SearchPerformed { get; set; }
-    public string SearchQuery { get; set; }
-    public string FilterProvince { get; set; }
-    public string FilterLocation { get; set; }
-    public string FilterType { get; set; }
+        /// <summary>
+        /// Number of files that have been digitized.
+        /// </summary>
+        public int DigitizedFiles { get; set; }
 
+        /// <summary>
+        /// Recent notifications to display (e.g., last 5 handled requests).
+        /// </summary>
+        public List<Notification> Notifications { get; set; } = new List<Notification>();
+    }
 }

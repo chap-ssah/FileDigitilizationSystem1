@@ -35,39 +35,41 @@ namespace FileDigitilizationSystem.Controllers
         // GET: /Admin/Dashboard
         public async Task<IActionResult> Dashboard()
         {
-            // Fetch users and map to view models
-            var users = await _userManager.Users.ToListAsync();
-            var userVMs = new List<UserViewModel>();
-            foreach (var u in users)
+            var users = await _userManager.Users.ToListAsync(); // Fetch all users first
+
+            var userViewModels = new List<UserViewModel>();
+
+            foreach (var user in users)
             {
-                var roles = await _userManager.GetRolesAsync(u);
-                userVMs.Add(new UserViewModel
+                var roles = await _userManager.GetRolesAsync(user); // Now safely fetch roles
+                userViewModels.Add(new UserViewModel
                 {
-                    Id = u.Id,
-                    FirstName = u.FirstName,
-                    LastName = u.LastName,
-                    Email = u.Email,
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
                     Role = roles.FirstOrDefault() ?? string.Empty,
-                    IsActive = u.IsActive,
-                    LastLogin = u.LastLogin,
-                    FailedLoginAttempts = u.AccessFailedCount
+                    IsActive = user.IsActive,
                 });
             }
 
-            var model = new DashboardViewModel
+            var rolesList = await _roleManager.Roles
+                .Select(r => new RoleViewModel
+                {
+                    Id = r.Id,
+                    Name = r.Name
+                }).ToListAsync();
+
+            var viewModel = new DashboardViewModel
             {
-                ActiveUsers = userVMs.Count(u => u.IsActive),
-                PendingRequests = 0, // TODO: implement actual pending requests count
-                SecurityAlerts = userVMs.Sum(u => u.FailedLoginAttempts),
-                RecentActivities = await GetRecentActivities(),
-                Alerts = await GetSecurityAlerts(),
-                Users = userVMs,
-                PasswordPolicy = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$",
-                PasswordPolicyText = "Minimum 8 characters with 1 uppercase, 1 lowercase, and 1 number"
+                Users = userViewModels,
+                Roles = rolesList
             };
 
-            return View(model);
+            return View(viewModel);
         }
+
+
 
         // GET: /Admin/Users
         public async Task<IActionResult> Users()
@@ -86,38 +88,18 @@ namespace FileDigitilizationSystem.Controllers
                     Role = roles.FirstOrDefault() ?? string.Empty,
                     IsActive = u.IsActive,
                     LastLogin = u.LastLogin,
-                    FailedLoginAttempts = u.AccessFailedCount
+                    FailedLoginAttempts = u.AccessFailedCount,
+                    PhoneNumber = u.PhoneNumber,      
+                    Address = u.Address,              
+                    Gender = u.Gender                 
                 });
+
             }
             return View(list);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateRole(string roleName)
-        {
-            if (!string.IsNullOrWhiteSpace(roleName))
-            {
-                var roleExists = await _roleManager.RoleExistsAsync(roleName);
-                if (!roleExists)
-                {
-                    var result = await _roleManager.CreateAsync(new IdentityRole(roleName));
-                    if (result.Succeeded)
-                    {
-                        TempData["Success"] = "Role created successfully.";
-                    }
-                    else
-                    {
-                        TempData["Error"] = "Failed to create role.";
-                    }
-                }
-                else
-                {
-                    TempData["Warning"] = "Role already exists.";
-                }
-            }
 
-            return RedirectToAction("Dashboard");
-        }
+
 
         // GET: /Admin/Create
         public async Task<IActionResult> Create()
@@ -153,8 +135,12 @@ namespace FileDigitilizationSystem.Controllers
                 LastName = model.LastName,
                 Email = model.Email,
                 UserName = model.Email,
+                PhoneNumber = model.PhoneNumber,
+                Address = model.Address,
+                Gender = model.Gender,
                 IsActive = true
             };
+
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
@@ -172,58 +158,58 @@ namespace FileDigitilizationSystem.Controllers
             return View(model);
         }
 
-
-        // GET: /Admin/Edit/{id}
-        public async Task<IActionResult> Edit(string id)
+        private void AddErrors(IdentityResult result)
         {
-            if (string.IsNullOrEmpty(id)) return NotFound();
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+        }
+
+       // GET: Admin/EditUser/id
+public async Task<IActionResult> EditUser(string id)
+        {
+            if (id == null) return NotFound();
+
             var user = await _userManager.FindByIdAsync(id);
             if (user == null) return NotFound();
 
-            var roles = await _roleManager.Roles
-                .Select(r => new SelectListItem(r.Name, r.Name))
-                .ToListAsync();
-            ViewBag.RoleList = roles;
-
-            var userRole = (await _userManager.GetRolesAsync(user)).FirstOrDefault() ?? string.Empty;
-            var vm = new UserViewModel
+            var model = new EditUserViewModel
             {
                 Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                Address = user.Address,
+                Gender = user.Gender,
                 Email = user.Email,
-                Role = userRole,
-                IsActive = user.IsActive
+                Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault()
             };
-            return View(vm);
+
+            ViewBag.RoleList = new SelectList(_roleManager.Roles, "Name", "Name");  // Load roles for dropdown
+            return View(model);
         }
 
-        // POST: /Admin/Edit
+        // POST: Admin/EditUser
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(UserViewModel model)
+        public async Task<IActionResult> EditUser(EditUserViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                // re-populate roles on error
-                ViewBag.RoleList = await _roleManager.Roles
-                    .Select(r => new SelectListItem(r.Name, r.Name))
-                    .ToListAsync();
+                ViewBag.RoleList = new SelectList(_roleManager.Roles, "Name", "Name");
                 return View(model);
             }
 
             var user = await _userManager.FindByIdAsync(model.Id);
             if (user == null) return NotFound();
 
-            // update fields
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
-            user.Email = model.Email;
-            user.UserName = model.Email;
-            user.IsActive = model.IsActive;
-            user.DeactivationDate = model.IsActive ? (DateTime?)null : DateTime.UtcNow;
+            user.PhoneNumber = model.PhoneNumber;
+            user.Address = model.Address;
+            user.Gender = model.Gender;
 
-            // update role if changed
             var currentRoles = await _userManager.GetRolesAsync(user);
             if (!currentRoles.Contains(model.Role))
             {
@@ -231,86 +217,31 @@ namespace FileDigitilizationSystem.Controllers
                 await _userManager.AddToRoleAsync(user, model.Role);
             }
 
-            var result = await _userManager.UpdateAsync(user);
-            if (result.Succeeded)
-                return RedirectToAction(nameof(Users));
+            await _userManager.UpdateAsync(user);
 
-            AddErrors(result);
-            ViewBag.RoleList = await _roleManager.Roles
-                .Select(r => new SelectListItem(r.Name, r.Name))
-                .ToListAsync();
-            return View(model);
+            return RedirectToAction("Users");
         }
 
-        // POST: /Admin/SendPasswordResetEmail/5
+        // POST: Admin/ToggleUserStatus/{id}
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SendPasswordResetEmail(string userId)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                // avoid user‑enumeration
-                return RedirectToAction(nameof(Users));
-            }
-
-            // 1) Generate reset token
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            // 2) Encode it for use in URL
-            var code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-
-            // 3) Build callback URL to Identity's ResetPassword page
-            var callbackUrl = Url.Page(
-                "/Account/ResetPassword",
-                pageHandler: null,
-                values: new { area = "Identity", code, email = user.Email },
-                protocol: Request.Scheme);
-
-            // 4) Send the email
-            await _emailSender.SendEmailAsync(
-                user.Email,
-                "Reset your password",
-                $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-            // Optionally display a success message in TempData
-            TempData["StatusMessage"] = "Password reset email sent.";
-            return RedirectToAction(nameof(Users));
-        }
-
-
-        // POST: /Admin/ToggleActivation/{id}
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ToggleActivation(string id)
+        public async Task<IActionResult> ToggleUserStatus(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null) return NotFound();
 
-            user.IsActive = !user.IsActive;
-            user.DeactivationDate = user.IsActive ? (DateTime?)null : DateTime.UtcNow;
-            var result = await _userManager.UpdateAsync(user);
-            if (!result.Succeeded)
-                AddErrors(result);
+            user.IsActive = !user.IsActive; // flip status
+            await _userManager.UpdateAsync(user);
 
-            return RedirectToAction(nameof(Users));
+            return RedirectToAction("Users");
         }
 
-        private async Task<List<ActivityItem>> GetRecentActivities()
-        {
-            // Placeholder
-            return new List<ActivityItem>();
-        }
 
-        private async Task<List<AlertItem>> GetSecurityAlerts()
-        {
-            // Placeholder
-            return new List<AlertItem>();
-        }
 
-        private void AddErrors(IdentityResult result)
-        {
-            foreach (var error in result.Errors)
-                ModelState.AddModelError(string.Empty, error.Description);
-        }
+
+
+
+
+
+
     }
 }

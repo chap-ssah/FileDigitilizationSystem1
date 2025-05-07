@@ -2,42 +2,62 @@
 @{
     Layout = "~/Views/Shared/_RequesterLayout.cshtml";
 }
-<h2>Request Missing File</h2>
-<form asp-action="RequestMissing" method="post">
-    <div class="mb-3">
-        <label asp-for="Reference"></label>
-        <input asp-for="Reference" class="form-control" />
-        <span asp-validation-for="Reference" class="text-danger"></span>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm rounded-4">
+                <div class="card-header bg-light text-dark rounded-top-4 border-bottom">
+                    <h3 class="mb-0">Request Missing File</h3>
+                </div>
+                <div class="card-body p-4 bg-light rounded-bottom-4">
+                    <form asp-action="RequestMissing" method="post">
+                        <div class="mb-3">
+                            <label asp-for="Reference" class="form-label fw-semibold"></label>
+                            <input asp-for="Reference" class="form-control" placeholder="Enter reference number..." />
+                            <span asp-validation-for="Reference" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Suburb" class="form-label fw-semibold"></label>
+                            <input asp-for="Suburb" class="form-control" placeholder="Enter suburb..." />
+                            <span asp-validation-for="Suburb" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ApplicantType" class="form-label fw-semibold"></label>
+                            <select asp-for="ApplicantType" class="form-select" asp-items="ViewBag.ApplicantTypes">
+                                <option value="">-- Select Type --</option>
+                            </select>
+                            <span asp-validation-for="ApplicantType" class="text-danger small"></span>
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label asp-for="ApplicantName" class="form-label fw-semibold"></label>
+                            <input asp-for="ApplicantName" class="form-control" placeholder="Enter applicant name..." />
+                            <span asp-validation-for="ApplicantName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Province" class="form-label fw-semibold"></label>
+                            <input asp-for="Province" class="form-control" placeholder="Enter province..." />
+                            <span asp-validation-for="Province" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label fw-semibold"></label>
+                            <textarea asp-for="Notes" class="form-control" rows="4" placeholder="Additional notes..."></textarea>
+                            <span asp-validation-for="Notes" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary px-4 me-2">Submit</button>
+                            <a asp-controller="Requester" asp-action="Dashboard" class="btn btn-outline-secondary px-4">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="mb-3">
-        <label asp-for="Suburb"></label>
-        <input asp-for="Suburb" class="form-control" />
-        <span asp-validation-for="Suburb" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="ApplicantType"></label>
-        <select asp-for="ApplicantType" class="form-select"
-                asp-items="@(ViewBag.ApplicantTypes as SelectList)">
-            <option value="">-- Select Type --</option>
-        </select>
-        <span asp-validation-for="ApplicantType" class="text-danger"></span>
-    </div>
-    <!-- existing fields -->
-    <div class="mb-3">
-        <label asp-for="ApplicantName"></label>
-        <input asp-for="ApplicantName" class="form-control" />
-        <span asp-validation-for="ApplicantName" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="Province"></label>
-        <input asp-for="Province" class="form-control" />
-        <span asp-validation-for="Province" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="Notes"></label>
-        <textarea asp-for="Notes" class="form-control"></textarea>
-        <span asp-validation-for="Notes" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary">Submit Request</button>
-    <a asp-controller="Requester" asp-action="Dashboard" class="btn btn-secondary ms-2">Cancel</a>
-</form>
+</div>

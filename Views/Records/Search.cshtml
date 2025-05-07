@@ -1,0 +1,104 @@
+﻿@model List<FileDigitilizationSystem.Models.FileRecord>
+
+@{
+    ViewData["Title"] = "Digitized Files";
+    Layout = "~/Views/Shared/_RecordsLayout.cshtml";
+}
+
+<div class="card shadow-sm rounded-4 mb-4">
+    <div class="card-header bg-light border-bottom-0">
+        <h5 class="mb-0">Search Digitized Files</h5>
+    </div>
+
+    <div class="card-body p-4">
+        <form asp-action="Digitized" method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Keyword</label>
+                <input name="q" value="@ViewContext.HttpContext.Request.Query["q"]"
+                       class="form-control" placeholder="Reference, Applicant Name…" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Province</label>
+                <select name="province" class="form-select" asp-items="ViewBag.ProvinceList">
+                    <option value="">All Provinces</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Suburb</label>
+                <select name="location" class="form-select" asp-items="ViewBag.LocationList">
+                    <option value="">All Suburbs</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Applicant Type</label>
+                <select name="type" class="form-select" asp-items="ViewBag.ApplicantTypeList">
+                    <option value="">All Types</option>
+                </select>
+            </div>
+            <div class="col-md-2 text-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.Any())
+{
+    <div class="card shadow-sm rounded-4">
+        <div class="card-header bg-light border-bottom-0">
+            <h5 class="mb-0">Digitized Files List</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Reference</th>
+                        <th>Applicant</th>
+                        <th>Type</th>
+                        <th>Suburb</th>
+                        <th>Province</th>
+                        <th>Uploaded At</th>
+                        <th>Status</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var f in Model)
+                    {
+                        <tr>
+                            <td>@f.Reference</td>
+                            <td>@f.ApplicantName</td>
+                            <td>@f.ApplicantType</td>
+                            <td>@f.Location</td>
+                            <td>@f.Province</td>
+                            <td>@f.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>
+                                <span class="badge bg-success">Digitized</span>
+                            </td>
+                            <td class="text-end">
+                                @if (!string.IsNullOrEmpty(f.FilePath))
+                                {
+                                    <a class="btn btn-sm btn-outline-primary" href="~/@f.FilePath" target="_blank">
+                                        <i class="bi bi-download me-1"></i> Download
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">No File</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning shadow-sm">
+        No digitized files found.
+    </div>
+}

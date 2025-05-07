@@ -1,14 +1,16 @@
-﻿@model FileDigitilizationSystem.Models.CreateUserModel
+﻿@model FileDigitilizationSystem.Models.EditUserViewModel
 @{
-    ViewData["Title"] = "Add New User";
+    ViewData["Title"] = "Edit User";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="container py-4">
     <div class="card shadow-lg border-0 rounded-4 p-4 card-hover">
-        <h2 class="mb-4 text-center">Add New User</h2>
+        <h2 class="mb-4 text-center">Edit User</h2>
 
-        <form asp-action="Create" method="post" class="row g-3">
+        <form asp-action="EditUser" method="post" class="row g-3">
+            <input type="hidden" asp-for="Id" />
+
             <div class="col-md-6">
                 <label asp-for="FirstName" class="form-label">First Name</label>
                 <input asp-for="FirstName" class="form-control" />
@@ -45,14 +47,8 @@
 
             <div class="col-md-6">
                 <label asp-for="Email" class="form-label">Email</label>
-                <input asp-for="Email" class="form-control" />
+                <input asp-for="Email" class="form-control" readonly /> <!-- Disable Email editing -->
                 <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-
-            <div class="col-md-6">
-                <label asp-for="Password" class="form-label">Password</label>
-                <input asp-for="Password" type="password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
@@ -64,7 +60,7 @@
             </div>
 
             <div class="col-12 mt-4 text-center">
-                <button type="submit" class="btn btn-primary px-4">Create User</button>
+                <button type="submit" class="btn btn-success px-4">Save Changes</button>
                 <a asp-action="Users" class="btn btn-secondary ms-2 px-4">Cancel</a>
             </div>
         </form>

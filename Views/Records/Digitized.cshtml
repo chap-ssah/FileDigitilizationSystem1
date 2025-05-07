@@ -1,0 +1,61 @@
+﻿@model List<FileDigitilizationSystem.Models.FileRecord>
+@{
+    Layout = "~/Views/Shared/_RecordsLayout.cshtml";
+    ViewData["Title"] = "Digitized Files";
+}
+
+<div class="card shadow-sm rounded-4 mb-4">
+    <div class="card-header bg-light border-bottom-0 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">@ViewData["Title"]</h5>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Reference</th>
+                    <th>Applicant</th>
+                    <th>Type</th>
+                    <th>Location</th>
+                    <th>Province</th>
+                    <th>Created At</th>
+                    <th>Status</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var file in Model)
+                {
+                    <tr>
+                        <td>@file.Reference</td>
+                        <td>@file.ApplicantName</td>
+                        <td>@file.ApplicantType</td>
+                        <td>@file.Location</td>
+                        <td>@file.Province</td>
+                        <td>@file.CreatedAt.ToString("yyyy‑MM‑dd")</td>
+                        <td>
+                            <span class="badge @(file.IsDigital ? "bg-success" : "bg-secondary")">
+                                @file.Status
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            @if (!string.IsNullOrEmpty(file.FilePath))
+                            {
+                                <a href="@Url.Content("~/" + file.FilePath)"
+                                   class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-download me-1"></i> Download
+                                </a>
+                            }
+                            else
+                            {
+                                <button class="btn btn-sm btn-outline-secondary" disabled>
+                                    <i class="bi bi-download me-1"></i> N/A
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

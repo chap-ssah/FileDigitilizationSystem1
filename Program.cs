@@ -4,6 +4,7 @@ using FileDigitilizationSystem.Data;
 using FileDigitilizationSystem.Models;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using FileDigitilizationSystem.Services;
+using FileDigitilizationSystem.Areas.Identity.Data;
 
     var builder = WebApplication.CreateBuilder(args);
 
@@ -11,19 +12,15 @@ using FileDigitilizationSystem.Services;
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
-{
-    // Configure identity options here if needed:
-    options.SignIn.RequireConfirmedAccount = false;
-})
-    .AddRoles<IdentityRole>() // if you're using roles such as "Admin", etc.
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultUI();  // This adds the default UI for Identity.
+builder.Services.AddDefaultIdentity<ApplicationUser>(options => { /*…*/ })
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Identity/Account/Login";
-    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    options.LoginPath = "/Auth/Login";
+    options.AccessDeniedPath = "/Auth/Login";
     options.SlidingExpiration = true;
 });
 
@@ -58,7 +55,7 @@ app.UseAuthorization();
 // Set up default routing.
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Auth}/{action=Login}/{id?}");
 
 app.MapRazorPages(); // This exposes the Identity UI endpoints.
 

@@ -1,0 +1,52 @@
+﻿@model List<FileRequest>
+@{
+    Layout = "~/Views/Shared/_RecordsLayout.cshtml";
+}
+
+<div class="card shadow-sm rounded-4 mb-4">
+    <div class="card-header bg-light border-bottom-0">
+        <h5 class="mb-0">Requested Files</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Reference</th>
+                    <th>Applicant</th>
+                    <th>Type</th>
+                    <th>Suburb</th>
+                    <th>Province</th>
+                    <th>Notes</th>
+                    <th>Status</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model)
+                {
+                    <tr>
+                        <td>@r.Reference</td>
+                        <td>@r.ApplicantName</td>
+                        <td>@r.ApplicantType</td>
+                        <td>@r.Suburb</td>
+                        <td>@r.Province</td>
+                        <td>@r.Notes</td>
+                        <td>
+                            <span class="badge bg-@(r.Handled ? "success" : "warning")">
+                                @(r.Handled ? "Completed" : "Pending")
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a asp-controller="Records"
+                               asp-action="Create"
+                               asp-route-requestId="@r.Id"
+                               class="btn btn-sm btn-primary">
+                                <i class="bi bi-upload me-1"></i> Digitize
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
